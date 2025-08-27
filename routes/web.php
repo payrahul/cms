@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DepartmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,11 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+
+    Route::resource('department', DepartmentController::class)->names('department');
+    // Route::get('department/data', [DepartmentController::class, 'data'])->name('department.data');
+
+    // Route::post('/save_department', [DepartmentController::class,'saveDepartment']);
 });
 
 
