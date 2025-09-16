@@ -57,10 +57,14 @@ class DepartmentController extends Controller
      */
     public function show(Request $request)
     {
-        // dd(1);
+        
         $query = Department::query();
 
-        $total = $query->count();
+        if ($search = $request->search){
+            $query->where('name','like',"%{$search}%");   
+        }
+
+        $totalNotFiltered = Department::count();
         $filtered = $query->count(); // Change if you add filters
 
         $rows = $query
@@ -70,8 +74,8 @@ class DepartmentController extends Controller
             ->get(['id', 'name']);
 
         return response()->json([
-            'total' => $total,
-            'totalNotFiltered' => $filtered,
+            'total' => $filtered,
+            'totalNotFiltered' => $totalNotFiltered,
             'rows' => $rows
         ]);
     }
@@ -91,7 +95,26 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        dd($department,$request->all());
+        $validated = $request->validate([
+             'department' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('departments','name')
+                ->ignore($department->id)
+                ->whereNull('deleted_at'),
+            ],
+        ]);
+
+        $department->update([
+            'name'=> $validated['department'],
+        ]);
+
+        return response()->json([
+            'status'=> true,
+            'message'=>'Department updated successfully',
+            'data' => $department,
+        ]);
     }
 
     /**

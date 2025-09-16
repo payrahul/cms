@@ -48,7 +48,7 @@
                         data-side-pagination="server"
                         data-pagination="true"
                         data-page-list="[5, 10, 20, 50, 100]"
-                        data-search="false"
+                        data-search="true"
                         data-show-columns="true"
                         data-show-refresh="true"
                         data-mobile-responsive="true"
@@ -77,16 +77,17 @@
             <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
             </div>
             <div class="modal-body">
                  <div class="card mb-4">
                     <div class="card-body">
+                        <div id="update_message"></div>
                         <form id="editForm">
                             <div class="form-group">
-                                <input type="text" id="edit_id">
+                                <input type="hidden" id="edit_id">
                                 <label for="exampleInputEmail1">Department name</label>
                                 <input type="text" class="form-control" id="edit_department" name="edit_department">
                                 <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
@@ -148,7 +149,29 @@
                     _token: $('meta[name="csrf-token"]').attr('content'),
                 },
                 success :function (response) {
-                    console.log(response);
+                    // console.log(response);
+                    $('#editForm')[0].reset();
+                    $('#editModal').modal('hide');
+                    $('#update_message').html(
+                     `<div class="alert alert-success">Department updated successfully!</div>`
+                    );
+
+
+
+                    $('#table_list').bootstrapTable('refresh');
+                },
+                error: function (xhr){
+                    let  errorMsg = 'Something went wrong';
+
+                    if(xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        if (errors && errors.department) {
+                            errorMsg = errors.department[0];
+                        }
+                    }
+                    $('#update_message').html(
+                        `<div class="alert alert-danger">${errorMsg}</div>`
+                    );
                 }
             });
             // console.log(department);
@@ -180,7 +203,7 @@
                     _token : '{{ csrf_token() }}'
                 },
                 success: function(response){
-
+                    
                     $('#createForm')[0].reset();
                     $('#message').html(
                      `<div class="alert alert-success">Department created successfully!</div>`
