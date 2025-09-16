@@ -72,9 +72,39 @@
         </div>
     </div>
 
-    {{-- EDIT MODAL (Optional) --}}
-    <!--  -->
-</div>
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                 <div class="card mb-4">
+                    <div class="card-body">
+                        <form id="editForm">
+                            <div class="form-group">
+                                <input type="text" id="edit_id">
+                                <label for="exampleInputEmail1">Department name</label>
+                                <input type="text" class="form-control" id="edit_department" name="edit_department">
+                                <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                            </div>
+                
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -90,6 +120,41 @@
     $('#table_list').on('load-error.bs.table', function (e, status, res) {
         console.error("Table load error:", status, res);
     });
+
+    $("#editForm").validate({
+        rules:{
+            edit_department:{
+                required:true,
+            }
+        },
+        messages:{
+            edit_department:{
+                required: "Please enter your department"
+            }
+        },
+        submitHandler: function (form,event){
+            event.preventDefault();
+
+            let department = $('#edit_department').val();
+            let id = $('#edit_id').val();
+
+            $.ajax({
+                url: `department/${id}/`,
+                method: 'POST',
+                data:{
+                    _method: 'PUT',
+                    id: id,
+                    department:department,
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                },
+                success :function (response) {
+                    console.log(response);
+                }
+            });
+            // console.log(department);
+        }
+    });
+
     $('#createForm').validate({
         rules: {
             department:{
@@ -142,11 +207,37 @@
 
     function actionFormatter(value, row, index){
         return`
+        <button class="btn btn-primary btn-sm edit-btn" data-id="${row.id}">
+            Edit
+        </button>&nbsp;
         <button class="btn btn-danger btn-sm delete-btn" data-id="${row.id}">
             Delete
         </button>
         `;
     }
+
+    $(document).on('click', '.edit-btn', function () {
+        let id = $(this).data('id');
+        console.log(id);
+
+        $.ajax({
+            url: `/department/${id}/edit`,
+            method: `GET`,
+            data:{
+                id:id,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function (response) {
+                console.log(response);
+
+                $('#editModal').modal('show');
+
+                $("#edit_department").val(response.name);
+                $('#edit_id').val(response.id);
+            }
+        });
+    });
+
     $(document).on('click', '.delete-btn' , function () {
         let id = $(this).data('id');
         

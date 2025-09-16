@@ -7,6 +7,9 @@
         <li class="nav-item mb-2">
             <a class="nav-link text-white" href="{{ route('users') }}">Users</a>
         </li>
+         <li class="nav-item mb-2">
+            <a class="nav-link text-white" href="{{ route('department.index') }}">Department</a>
+        </li>
         <li class="nav-item mb-2">
             <a class="nav-link text-white" href="#">Settings</a>
         </li>

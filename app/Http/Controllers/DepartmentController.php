@@ -81,7 +81,9 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        //
+        // dd($department);
+
+        return response()->json($department);
     }
 
     /**
@@ -89,7 +91,7 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        //
+        dd($department,$request->all());
     }
 
     /**
