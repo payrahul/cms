@@ -3,14 +3,13 @@
 @section('title', __('Department'))
 
 @section('content')
-<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.css">
 
 <div class="content-wrapper">
     <div class="page-header">
         <h3 class="page-title">{{ __('Manage') . ' ' . __('Department') }}</h3>
     </div>
 
-     <div class="row">
+    <div class="row">
         <div class="col-sm-12 grid-margin stretch-card">
             <div id="message"></div>
         </div>
@@ -109,11 +108,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
-<!-- Bootstrap Table JS -->
-<script src="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.21.2/dist/extensions/export/bootstrap-table-export.min.js"></script>
-<script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+
 <script>
     function indexFormatter(value, row, index) {
         return index + 1;

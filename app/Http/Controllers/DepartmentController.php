@@ -14,9 +14,6 @@ class DepartmentController extends Controller
     public function index()
     {
         return view('department.index');
-
-        // $departments = Department::latest()->paginate(2);
-        // return view('department.index', compact('departments'));
     }
 
     /**
@@ -24,8 +21,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        // $departments = Department::latest()->get();
-        // return view('departments.create', compact('departments'));
+        //
     }
 
     /**
