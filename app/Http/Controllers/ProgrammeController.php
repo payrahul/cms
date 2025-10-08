@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Programme;
 use App\Models\Department;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\Rule;
 class ProgrammeController extends Controller
 {
     /**
@@ -60,7 +60,13 @@ class ProgrammeController extends Controller
 
             // Apply search filter (fixed typo)
             if ($search = $request->input('search')) {
-                $query->where('name', 'like', "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('department', function ($q2) use ($search) {
+                        $q2->where('name','like', "%{$search}%");
+                    });
+                });
+                
             }
 
             // Count total & filtered
@@ -77,13 +83,18 @@ class ProgrammeController extends Controller
             // Transform data
             $data = $rows->map(function ($item, $index) use ($request) {
                 return [
-                    'id' => $request->input('offset', 0) + $index + 1,
+                    'no' => $request->input('offset', 0) + $index + 1,
+                    'id'=> $item->id,
                     'department_name' => $item->department->name ?? null,
                     'programme_name' => $item->name,
                 ];
             });
 
-            return response()->json($data, 200);
+            return response()->json([
+                'total'            => $filteredCount,        // rows after filtering (Bootstrap Table uses this)
+                'unfiltered_total' => $totalNotFilteredCount, // optional extra you can use elsewhere
+                'rows'             => $data
+            ]);
 
         } catch (\Exception $e) {
             // Handle error
@@ -101,7 +112,10 @@ class ProgrammeController extends Controller
      */
     public function edit(Programme $programme)
     {
-        //
+        $data = $programme->only(['id','name','department_id']);
+        // dd($data);
+
+        return response()->json($data);
     }
 
     /**
@@ -109,7 +123,21 @@ class ProgrammeController extends Controller
      */
     public function update(Request $request, Programme $programme)
     {
-        //
+
+        $validated = $request->validate([
+            'name'=> [
+                'required',
+                Rule::unique('programmes','name')->ignore($programme->id),
+            ],
+            'department_id'=>'required|exists:departments,id'
+        ]);
+
+        Programme::find($request->id)->update([
+            'name'=> $request->name,
+            'department_id' => $request->department_id
+        ]);
+
+        return response()->json(['message'=>'Programme updated successfully']);
     }
 
     /**
@@ -117,7 +145,10 @@ class ProgrammeController extends Controller
      */
     public function destroy(Programme $programme)
     {
-        $programme->delete();
+        // dd($programme);
+        $res = $programme->delete();
+
+        // dd($res);
 
         return response()->json(['message'=>'Programme deleted successfully']);
     }

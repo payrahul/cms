@@ -11,6 +11,9 @@
             <a class="nav-link text-white" href="{{ route('department.index') }}">Department</a>
         </li>
         <li class="nav-item mb-2">
+            <a class="nav-link text-white" href="{{ route('programme.index') }}">Programme</a>
+        </li>
+        <li class="nav-item mb-2">
             <a class="nav-link text-white" href="#">Settings</a>
         </li>
     </ul>

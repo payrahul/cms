@@ -59,7 +59,7 @@
                     >
                         <thead>
                             <tr>
-                                <th data-field="id" data-formatter="indexFormatter">{{ __('Serial No') }}</th>
+                                <th data-field="no" data-formatter="indexFormatter">{{ __('Serial No') }}</th>
                                 <th data-field="name" data-sortable="true">{{ __('Department Name') }}</th>
                                 <th data-field="id" data-formatter="actionFormatter" data-align="center" >{{ _('Action') }}</th>
                             </tr>
