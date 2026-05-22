@@ -84,6 +84,11 @@ class DepartmentController extends Controller
         ]);
     }
 
+    public function showBinding(Department $department)
+    {
+        dd($department);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */

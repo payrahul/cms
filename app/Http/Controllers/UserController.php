@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeUserMail;
+use App\Events\UserCreated;
+
 class UserController extends Controller
 {
     public function index()
@@ -24,9 +29,29 @@ class UserController extends Controller
             'current_page' => $users->currentPage(),
             'total_pages' => $users->lastPage(),
         ]);
-    }
+    }    
 
-    
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'name' => 'required|string',
+    //         'email' => 'required|unique:users|max:255|email',
+    //     ]);
+
+    //     $user = User::create([
+    //         'name' => $validated['name'],
+    //         'email' => $validated['email'],
+    //         'password' => Hash::make($validated['name']), // or generate/send a password
+    //     ]);
+
+    //      $plainPassword = '12345678';
+
+    //     $user->assignRole('User');
+
+    //    event(new UserCreated($user, $plainPassword));
+
+    //     return response()->json(['success'=> 'Data saved successfully']);
+    // }
 
     public function store(Request $request)
     {
@@ -35,13 +60,40 @@ class UserController extends Controller
             'email' => 'required|unique:users|max:255|email',
         ]);
 
-        User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['name']), // or generate/send a password
-        ]);
+        $plainPassword = '12345678';
 
-        return response()->json(['success'=> 'Data saved successfully']);
+        try {
+
+            // Temporary user object for email
+            $tempUser = (object) [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+            ];
+
+            // Send email first
+            Mail::to($validated['email'])
+                ->send(new WelcomeUserMail($tempUser, $plainPassword));
+
+            // Create user only if mail succeeds
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($plainPassword),
+            ]);
+
+            $user->assignRole('User');
+
+            return response()->json([
+                'success' => 'User created and email sent successfully'
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'error' => 'Email sending failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function search(Request $request)

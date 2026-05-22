@@ -14,6 +14,12 @@
             <a class="nav-link text-white" href="{{ route('programme.index') }}">Programme</a>
         </li>
         <li class="nav-item mb-2">
+            <a class="nav-link text-white" href="{{ route('semesters.index') }}">Semesters</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link text-white" href="{{ route('task.index') }}">Tasks</a>
+        </li>
+        <li class="nav-item mb-2">
             <a class="nav-link text-white" href="#">Settings</a>
         </li>
     </ul>
